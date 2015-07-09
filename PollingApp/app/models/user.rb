@@ -9,7 +9,7 @@
 #
 
 class User < ActiveRecord::Base
-  validates :name, presence => true
+  validates :name, :presence => true
 
   has_many(
     :authored_polls,
@@ -21,7 +21,8 @@ class User < ActiveRecord::Base
   has_many(
     :responses,
     class_name: 'Response',
-    foreign_key: :
+    foreign_key: :respondent_id,
+    primary_key: :id
   )
 
 end
