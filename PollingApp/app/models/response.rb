@@ -10,7 +10,9 @@
 #
 
 class Response < ActiveRecord::Base
-  validates :text, :question_id, :presence => true
+  validates :respondent_id, :answer_choice_id, :presence => true
+  validates :answer_choice_id, uniqueness: { scope: :respondent_id }
+  validate :respondent_has_not_already_answered_question
 
   belongs_to(
     :answer_choice,
@@ -27,13 +29,19 @@ class Response < ActiveRecord::Base
   )
 
   has_one(
-    :question
+    :question,
     through: :answer_choice,
     source: :question
   )
 
   def sibling_responses
+    question.responses.where(':id IS NULL OR responses.id != :id', id: self.id)
+  end
 
+  def respondent_has_not_already_answered_question
+    if sibling_responses.exists?(:respondent_id => self.respondent_id)
+      errors[:respondent_id] << "has already answered this question"
+    end
   end
 
 end
