@@ -32,4 +32,14 @@ class Question < ActiveRecord::Base
     source: :responses
   )
 
+  def results
+    answers = answer_choices.includes(:responses)
+
+    answer_hash = Hash.new
+    answers.each do |answer|
+      answer_hash[answer.text] = answer.responses.count
+    end
+    answer_hash
+  end
+
 end
